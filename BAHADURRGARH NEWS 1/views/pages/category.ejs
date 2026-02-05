@@ -1,0 +1,173 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title><%= category.charAt(0).toUpperCase() + category.slice(1) %> News - Bahadurgarh News</title>
+    <meta name="description" content="Latest <%= category %> news and articles from Bahadurgarh News">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body class="bg-gray-50">
+    <!-- Navigation -->
+    <nav class="bg-white shadow-lg sticky top-0 z-50">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between h-16">
+                <div class="flex items-center">
+                    <a href="/" class="text-2xl font-bold text-blue-600">Bahadurgarh News</a>
+                </div>
+                <div class="flex items-center space-x-4">
+                    <% if (user) { %>
+                        <a href="/profile" class="text-gray-700 hover:text-blue-600">
+                            <i class="fas fa-user"></i> <%= user.name %>
+                        </a>
+                        <a href="/logout" class="text-gray-700 hover:text-blue-600">
+                            <i class="fas fa-sign-out-alt"></i> Logout
+                        </a>
+                    <% } else { %>
+                        <a href="/login" class="text-gray-700 hover:text-blue-600">Login</a>
+                        <a href="/register" class="text-gray-700 hover:text-blue-600">Register</a>
+                    <% } %>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Category Articles -->
+    <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        <div class="mb-8">
+            <h1 class="text-3xl font-bold text-gray-900 mb-2">
+                <%= category.charAt(0).toUpperCase() + category.slice(1) %> News
+            </h1>
+            <p class="text-gray-600">
+                <%= total %> articles found
+                <% if (totalPages > 1) { %>
+                    - Page <%= currentPage %> of <%= totalPages %>
+                <% } %>
+            </p>
+        </div>
+
+        <div class="grid grid-cols-1 lg:grid-cols-4 gap-8">
+            <!-- Main Content -->
+            <div class="lg:col-span-3">
+                <% if (articles.length > 0) { %>
+                    <div class="space-y-6">
+                        <% articles.forEach(article => { %>
+                            <article class="bg-white rounded-lg shadow-md overflow-hidden hover:shadow-lg transition-shadow">
+                                <% if (article.imageUrl) { %>
+                                    <img src="<%= article.imageUrl %>" alt="<%= article.title %>" class="w-full h-48 object-cover">
+                                <% } %>
+                                <div class="p-6">
+                                    <div class="flex items-center text-sm text-gray-500 mb-2">
+                                        <span class="bg-blue-100 text-blue-800 px-2 py-1 rounded text-xs font-semibold">
+                                            <%= article.category %>
+                                        </span>
+                                        <span class="mx-2">•</span>
+                                        <time datetime="<%= article.publishDate %>">
+                                            <%= article.formattedPublishDate %>
+                                        </time>
+                                        <span class="mx-2">•</span>
+                                        <span><%= article.readingTime %> min read</span>
+                                    </div>
+                                    <h2 class="text-xl font-bold text-gray-900 mb-2">
+                                        <a href="/article/<%= article._id %>" class="hover:text-blue-600">
+                                            <%= article.title %>
+                                        </a>
+                                    </h2>
+                                    <p class="text-gray-600 mb-4"><%= article.shortDescription %></p>
+                                    <div class="flex items-center justify-between">
+                                        <div class="flex items-center text-sm text-gray-500">
+                                            <i class="fas fa-user mr-2"></i>
+                                            <%= article.author.name %>
+                                        </div>
+                                        <div class="flex items-center text-sm text-gray-500">
+                                            <i class="fas fa-eye mr-1"></i>
+                                            <%= article.views %>
+                                        </div>
+                                    </div>
+                                </div>
+                            </article>
+                        <% }); %>
+                    </div>
+
+                    <!-- Pagination -->
+                    <% if (totalPages > 1) { %>
+                        <div class="mt-8 flex justify-center">
+                            <nav class="flex items-center space-x-2">
+                                <% if (currentPage > 1) { %>
+                                    <a href="/category/<%= category %>?page=<%= currentPage - 1 %>" 
+                                       class="px-3 py-2 bg-white border border-gray-300 rounded-md hover:bg-gray-50">
+                                        Previous
+                                    </a>
+                                <% } %>
+                                
+                                <% for (let i = 1; i <= totalPages; i++) { %>
+                                    <% if (i === currentPage) { %>
+                                        <span class="px-3 py-2 bg-blue-600 text-white rounded-md">
+                                            <%= i %>
+                                        </span>
+                                    <% } else { %>
+                                        <a href="/category/<%= category %>?page=<%= i %>" 
+                                           class="px-3 py-2 bg-white border border-gray-300 rounded-md hover:bg-gray-50">
+                                            <%= i %>
+                                        </a>
+                                    <% } %>
+                                <% } %>
+                                
+                                <% if (currentPage < totalPages) { %>
+                                    <a href="/category/<%= category %>?page=<%= currentPage + 1 %>" 
+                                       class="px-3 py-2 bg-white border border-gray-300 rounded-md hover:bg-gray-50">
+                                        Next
+                                    </a>
+                                <% } %>
+                            </nav>
+                        </div>
+                    <% } %>
+                <% } else { %>
+                    <div class="text-center py-12">
+                        <i class="fas fa-folder-open text-6xl text-gray-300 mb-4"></i>
+                        <h2 class="text-2xl font-bold text-gray-900 mb-2">No articles found</h2>
+                        <p class="text-gray-600 mb-6">
+                            No articles found in the <%= category %> category.
+                        </p>
+                        <a href="/" class="inline-block bg-blue-600 text-white px-6 py-3 rounded-lg hover:bg-blue-700">
+                            Browse Latest Articles
+                        </a>
+                    </div>
+                <% } %>
+            </div>
+
+            <!-- Sidebar -->
+            <div class="lg:col-span-1">
+                <!-- Quick Links -->
+                <div class="bg-white rounded-lg shadow-md p-6 mb-6">
+                    <h3 class="text-lg font-bold text-gray-900 mb-4">Quick Links</h3>
+                    <div class="space-y-2">
+                        <a href="/" class="block px-3 py-2 text-gray-700 hover:bg-gray-100 rounded">
+                            <i class="fas fa-home mr-2"></i> Home
+                        </a>
+                        <a href="/articles/latest" class="block px-3 py-2 text-gray-700 hover:bg-gray-100 rounded">
+                            <i class="fas fa-clock mr-2"></i> Latest
+                        </a>
+                        <a href="/articles/featured" class="block px-3 py-2 text-gray-700 hover:bg-gray-100 rounded">
+                            <i class="fas fa-star mr-2"></i> Featured
+                        </a>
+                        <a href="/articles/trending" class="block px-3 py-2 text-gray-700 hover:bg-gray-100 rounded">
+                            <i class="fas fa-fire mr-2"></i> Trending
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- Footer -->
+    <footer class="bg-gray-800 text-white mt-12">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+            <div class="text-center">
+                <p>&copy; 2024 Bahadurgarh News. All rights reserved.</p>
+            </div>
+        </div>
+    </footer>
+</body>
+</html>
