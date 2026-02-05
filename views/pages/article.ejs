@@ -1,0 +1,574 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title><%= article.title %> - Bahadurgarh News</title>
+    <meta name="description" content="<%= article.shortDescription %>">
+    <meta name="keywords" content="<%= article.tags.join(', ') %>">
+    <meta property="og:title" content="<%= article.title %>">
+    <meta property="og:description" content="<%= article.shortDescription %>">
+    <meta property="og:image" content="<%= article.imageUrl %>">
+    <meta property="og:type" content="article">
+    <meta property="og:url" content="<%= req.originalUrl %>">
+    
+    <link rel="stylesheet" href="/css/style.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body class="bg-gray-50">
+    <!-- Top Bar -->
+    <div class="bg-gray-900 text-white py-2 text-sm">
+        <div class="container mx-auto px-4">
+            <div class="flex justify-between items-center">
+                <div class="flex items-center space-x-4">
+                    <span id="current-date" class="text-gray-300"></span>
+                    <span class="text-gray-400">|</span>
+                    <a href="#" class="hover:text-white transition-colors">e-Paper</a>
+                </div>
+                <div class="flex items-center space-x-4">
+                    <% if (user) { %>
+                        <a href="/profile" class="hover:text-white transition-colors">
+                            <i class="fas fa-user mr-1"></i> <%= user.name %>
+                        </a>
+                        <a href="/logout" class="hover:text-white transition-colors">Logout</a>
+                    <% } else { %>
+                        <a href="/login" class="hover:text-white transition-colors">Login</a>
+                        <a href="/register" class="bg-red-600 px-3 py-1 rounded hover:bg-red-700 transition-colors">Sign Up</a>
+                    <% } %>
+                    <% if (user && user.role === 'admin') { %>
+                        <a href="/admin" class="text-yellow-400 hover:text-yellow-300 transition-colors">
+                            <i class="fas fa-user-shield"></i> Admin
+                        </a>
+                    <% } %>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Header -->
+    <header class="bg-white shadow-sm sticky top-0 z-50">
+        <div class="container mx-auto px-4">
+            <div class="flex justify-between items-center py-4">
+                <!-- Logo -->
+                <div class="flex items-center">
+                    <a href="/" class="text-3xl font-bold text-red-600 hover:text-red-700 transition-colors">
+                        Bahadurgarh News
+                    </a>
+                </div>
+                
+                <!-- Search Bar -->
+                <div class="hidden md:flex items-center flex-1 max-w-lg mx-8">
+                    <div class="relative w-full">
+                        <input type="text" 
+                               placeholder="Search news..." 
+                               class="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-red-500">
+                        <i class="fas fa-search absolute left-3 top-3 text-gray-400"></i>
+                    </div>
+                </div>
+
+                <!-- Social Links -->
+                <div class="flex items-center space-x-4">
+                    <a href="#" class="text-gray-600 hover:text-red-600 transition-colors">
+                        <i class="fab fa-facebook-f"></i>
+                    </a>
+                    <a href="#" class="text-gray-600 hover:text-red-600 transition-colors">
+                        <i class="fab fa-twitter"></i>
+                    </a>
+                    <a href="#" class="text-gray-600 hover:text-red-600 transition-colors">
+                        <i class="fab fa-instagram"></i>
+                    </a>
+                    <a href="#" class="text-gray-600 hover:text-red-600 transition-colors">
+                        <i class="fab fa-youtube"></i>
+                    </a>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <!-- Navigation -->
+    <nav class="bg-red-600 text-white sticky top-16 z-40 shadow-lg">
+        <div class="container mx-auto px-4">
+            <div class="flex items-center justify-between">
+                <div class="flex space-x-1 overflow-x-auto">
+                    <a href="/" class="text-white hover:bg-red-700 px-4 py-3 block">Home</a>
+                    <a href="/category/india" class="text-white hover:bg-red-700 px-4 py-3 block">India</a>
+                    <a href="/category/world" class="text-white hover:bg-red-700 px-4 py-3 block">World</a>
+                    <a href="/category/business" class="text-white hover:bg-red-700 px-4 py-3 block">Business</a>
+                    <a href="/category/sports" class="text-white hover:bg-red-700 px-4 py-3 block">Sports</a>
+                    <a href="/category/entertainment" class="text-white hover:bg-red-700 px-4 py-3 block">Entertainment</a>
+                    <a href="/category/technology" class="text-white hover:bg-red-700 px-4 py-3 block">Technology</a>
+                    <a href="/category/health" class="text-white hover:bg-red-700 px-4 py-3 block">Health</a>
+                    <a href="/videos" class="text-white hover:bg-red-700 px-4 py-3 block">
+                        <i class="fas fa-video mr-1"></i> Videos
+                    </a>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Breadcrumb -->
+    <div class="bg-white border-b">
+        <div class="container mx-auto px-4 py-3">
+            <nav class="flex items-center text-sm text-gray-600">
+                <a href="/" class="hover:text-red-600 transition-colors">Home</a>
+                <i class="fas fa-chevron-right mx-2 text-xs"></i>
+                <a href="/category/<%= article.category %>" class="hover:text-red-600 transition-colors capitalize">
+                    <%= article.category %>
+                </a>
+                <i class="fas fa-chevron-right mx-2 text-xs"></i>
+                <span class="text-gray-800 font-medium"><%= article.title %></span>
+            </nav>
+        </div>
+    </div>
+
+    <!-- Main Content -->
+    <main class="container mx-auto px-4 py-8">
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+            <!-- Article Content -->
+            <article class="lg:col-span-2">
+                <!-- Article Header -->
+                <header class="mb-6">
+                    <% if (article.featured) { %>
+                        <span class="inline-block bg-red-600 text-white px-3 py-1 rounded text-sm font-medium mb-3">
+                            <i class="fas fa-star mr-1"></i> Featured
+                        </span>
+                    <% } %>
+                    
+                    <h1 class="text-3xl lg:text-4xl font-bold text-gray-900 mb-4 leading-tight">
+                        <%= article.title %>
+                    </h1>
+                    
+                    <div class="flex flex-wrap items-center text-sm text-gray-600 mb-4 gap-4">
+                        <span class="flex items-center">
+                            <i class="far fa-user mr-2"></i>
+                            <%= article.author %>
+                        </span>
+                        <span class="flex items-center">
+                            <i class="far fa-calendar mr-2"></i>
+                            <%= new Date(article.createdAt).toLocaleDateString('en-US', { 
+                                year: 'numeric', 
+                                month: 'long', 
+                                day: 'numeric' 
+                            }) %>
+                        </span>
+                        <span class="flex items-center">
+                            <i class="far fa-clock mr-2"></i>
+                            <%= new Date(article.createdAt).toLocaleTimeString('en-US', { 
+                                hour: '2-digit', 
+                                minute: '2-digit' 
+                            }) %>
+                        </span>
+                        <span class="flex items-center">
+                            <i class="far fa-eye mr-2"></i>
+                            <%= article.views || 0 %> views
+                        </span>
+                    </div>
+
+                    <!-- Tags -->
+                    <div class="flex flex-wrap gap-2 mb-6">
+                        <% article.tags.forEach(tag => { %>
+                            <a href="/tag/<%= tag %>" class="bg-gray-200 text-gray-700 px-3 py-1 rounded-full text-sm hover:bg-gray-300 transition-colors">
+                                #<%= tag %>
+                            </a>
+                        <% }) %>
+                    </div>
+                </header>
+
+                <!-- Featured Image -->
+                <div class="mb-6">
+                    <img src="<%= article.imageUrl %>" 
+                         alt="<%= article.title %>" 
+                         class="w-full h-auto rounded-lg shadow-lg">
+                    <% if (article.imageCaption) { %>
+                        <p class="text-sm text-gray-600 mt-2 italic text-center"><%= article.imageCaption %></p>
+                    <% } %>
+                </div>
+
+                <!-- Social Share Buttons -->
+                <div class="flex flex-wrap gap-3 mb-6">
+                    <button onclick="shareOnFacebook()" class="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700 transition-colors">
+                        <i class="fab fa-facebook-f mr-2"></i> Share
+                    </button>
+                    <button onclick="shareOnTwitter()" class="bg-sky-500 text-white px-4 py-2 rounded hover:bg-sky-600 transition-colors">
+                        <i class="fab fa-twitter mr-2"></i> Tweet
+                    </button>
+                    <button onclick="shareOnWhatsApp()" class="bg-green-600 text-white px-4 py-2 rounded hover:bg-green-700 transition-colors">
+                        <i class="fab fa-whatsapp mr-2"></i> WhatsApp
+                    </button>
+                    <button onclick="shareOnLinkedIn()" class="bg-blue-700 text-white px-4 py-2 rounded hover:bg-blue-800 transition-colors">
+                        <i class="fab fa-linkedin-in mr-2"></i> LinkedIn
+                    </button>
+                    <button onclick="copyLink()" class="bg-gray-600 text-white px-4 py-2 rounded hover:bg-gray-700 transition-colors">
+                        <i class="fas fa-link mr-2"></i> Copy Link
+                    </button>
+                    <% if (user) { %>
+                        <button onclick="saveArticle('<%= article._id %>')" class="bg-yellow-500 text-white px-4 py-2 rounded hover:bg-yellow-600 transition-colors">
+                            <i class="fas fa-bookmark mr-2"></i> Save
+                        </button>
+                    <% } %>
+                </div>
+
+                <!-- Article Content -->
+                <div class="prose prose-lg max-w-none">
+                    <div class="text-gray-800 leading-relaxed space-y-4">
+                        <%= article.content %>
+                    </div>
+                </div>
+
+                <!-- Author Bio -->
+                <div class="bg-gray-100 rounded-lg p-6 mt-8">
+                    <div class="flex items-start space-x-4">
+                        <img src="https://via.placeholder.com/80x80/333/FFFFFF?text=Author" 
+                             alt="<%= article.author %>" 
+                             class="w-20 h-20 rounded-full">
+                        <div>
+                            <h3 class="font-semibold text-lg mb-1"><%= article.author %></h3>
+                            <p class="text-gray-600 text-sm mb-2">
+                                Senior Correspondent at Bahadurgarh News
+                            </p>
+                            <p class="text-gray-700">
+                                Experienced journalist covering politics, current affairs, and social issues. 
+                                With over 10 years of experience in journalism, bringing you accurate and 
+                                insightful news coverage.
+                            </p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Comments Section -->
+                <section class="mt-8">
+                    <h3 class="text-2xl font-bold mb-6">Comments (<%= comments.length %>)</h3>
+                    
+                    <% if (user) { %>
+                        <!-- Comment Form -->
+                        <div class="bg-white rounded-lg shadow-md p-6 mb-6">
+                            <h4 class="font-semibold mb-4">Leave a Comment</h4>
+                            <form id="commentForm" class="space-y-4">
+                                <textarea id="commentText" 
+                                          rows="4" 
+                                          placeholder="Share your thoughts..." 
+                                          class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-red-500"
+                                          required></textarea>
+                                <button type="submit" class="bg-red-600 text-white px-6 py-2 rounded hover:bg-red-700 transition-colors">
+                                    Post Comment
+                                </button>
+                            </form>
+                        </div>
+                    <% } else { %>
+                        <div class="bg-blue-50 border border-blue-200 rounded-lg p-4 mb-6">
+                            <p class="text-blue-800">
+                                <i class="fas fa-info-circle mr-2"></i>
+                                Please <a href="/login" class="text-blue-600 hover:underline">login</a> to post a comment.
+                            </p>
+                        </div>
+                    <% } %>
+
+                    <!-- Comments List -->
+                    <div class="space-y-4">
+                        <% comments.forEach(comment => { %>
+                            <div class="bg-white rounded-lg shadow-md p-6">
+                                <div class="flex items-start space-x-3">
+                                    <img src="https://via.placeholder.com/40x40/333/FFFFFF?text=User" 
+                                         alt="<%= comment.user.name %>" 
+                                         class="w-10 h-10 rounded-full">
+                                    <div class="flex-1">
+                                        <div class="flex items-center justify-between mb-2">
+                                            <h5 class="font-semibold"><%= comment.user.name %></h5>
+                                            <span class="text-sm text-gray-500">
+                                                <%= new Date(comment.createdAt).toLocaleDateString() %>
+                                            </span>
+                                        </div>
+                                        <p class="text-gray-700"><%= comment.content %></p>
+                                        <div class="mt-3 flex items-center space-x-4 text-sm">
+                                            <button class="text-gray-500 hover:text-red-600 transition-colors">
+                                                <i class="far fa-thumbs-up mr-1"></i> Like
+                                            </button>
+                                            <button class="text-gray-500 hover:text-red-600 transition-colors">
+                                                <i class="far fa-comment mr-1"></i> Reply
+                                            </button>
+                                            <% if (user && (user.role === 'admin' || user._id.toString() === comment.user._id.toString())) { %>
+                                                <button class="text-gray-500 hover:text-red-600 transition-colors">
+                                                    <i class="far fa-trash-alt mr-1"></i> Delete
+                                                </button>
+                                            <% } %>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        <% }) %>
+                    </div>
+                </section>
+            </article>
+
+            <!-- Sidebar -->
+            <aside class="lg:col-span-1">
+                <!-- Related Articles -->
+                <section class="mb-6 bg-white rounded-lg shadow-md p-4">
+                    <h3 class="text-xl font-bold text-gray-800 mb-4 border-b-2 border-red-600 pb-2">
+                        Related Articles
+                    </h3>
+                    <div class="space-y-4">
+                        <% relatedArticles.forEach(relatedArticle => { %>
+                            <article class="flex space-x-3">
+                                <img src="<%= relatedArticle.imageUrl %>" 
+                                     alt="<%= relatedArticle.title %>" 
+                                     class="w-24 h-20 object-cover rounded">
+                                <div>
+                                    <h4 class="font-semibold text-sm mb-1">
+                                        <a href="/article/<%= relatedArticle._id %>" class="text-gray-800 hover:text-red-600 transition-colors">
+                                            <%= relatedArticle.title %>
+                                        </a>
+                                    </h4>
+                                    <p class="text-xs text-gray-500">
+                                        <%= new Date(relatedArticle.createdAt).toLocaleDateString() %>
+                                    </p>
+                                </div>
+                            </article>
+                        <% }) %>
+                    </div>
+                </section>
+
+                <!-- Trending Stories -->
+                <section class="mb-6 bg-white rounded-lg shadow-md p-4">
+                    <h3 class="text-xl font-bold text-gray-800 mb-4 border-b-2 border-red-600 pb-2">
+                        <i class="fas fa-fire text-red-600 mr-2"></i>Trending Now
+                    </h3>
+                    <div class="space-y-3">
+                        <% trendingArticles.forEach((article, index) => { %>
+                            <div class="flex items-start space-x-3">
+                                <span class="text-xl font-bold text-red-600"><%= index + 1 %></span>
+                                <div>
+                                    <a href="/article/<%= article._id %>" class="text-gray-800 hover:text-red-600 transition-colors font-medium text-sm">
+                                        <%= article.title %>
+                                    </a>
+                                    <div class="text-xs text-gray-500 mt-1"><%= article.views || 0 %> views</div>
+                                </div>
+                            </div>
+                        <% }) %>
+                    </div>
+                </section>
+
+                <!-- Newsletter -->
+                <section class="mb-6 bg-red-600 text-white rounded-lg shadow-md p-4">
+                    <h3 class="text-xl font-bold mb-3">
+                        <i class="fas fa-envelope mr-2"></i>Newsletter
+                    </h3>
+                    <p class="text-sm mb-4">Get daily news updates delivered to your inbox</p>
+                    <form id="newsletterForm" class="space-y-3">
+                        <input type="email" 
+                               placeholder="Enter your email" 
+                               class="w-full px-3 py-2 rounded text-gray-800 focus:outline-none focus:ring-2 focus:ring-white">
+                        <button type="submit" class="w-full bg-white text-red-600 py-2 rounded font-medium hover:bg-gray-100 transition-colors">
+                            Subscribe Now
+                        </button>
+                    </form>
+                </section>
+
+                <!-- Categories -->
+                <section class="bg-white rounded-lg shadow-md p-4">
+                    <h3 class="text-xl font-bold text-gray-800 mb-4 border-b-2 border-red-600 pb-2">
+                        Categories
+                    </h3>
+                    <div class="space-y-2">
+                        <a href="/category/india" class="flex justify-between items-center text-gray-700 hover:text-red-600 transition-colors py-2">
+                            <span>India</span>
+                            <span class="bg-gray-200 px-2 py-1 rounded text-xs">24</span>
+                        </a>
+                        <a href="/category/world" class="flex justify-between items-center text-gray-700 hover:text-red-600 transition-colors py-2">
+                            <span>World</span>
+                            <span class="bg-gray-200 px-2 py-1 rounded text-xs">18</span>
+                        </a>
+                        <a href="/category/business" class="flex justify-between items-center text-gray-700 hover:text-red-600 transition-colors py-2">
+                            <span>Business</span>
+                            <span class="bg-gray-200 px-2 py-1 rounded text-xs">15</span>
+                        </a>
+                        <a href="/category/sports" class="flex justify-between items-center text-gray-700 hover:text-red-600 transition-colors py-2">
+                            <span>Sports</span>
+                            <span class="bg-gray-200 px-2 py-1 rounded text-xs">22</span>
+                        </a>
+                        <a href="/category/entertainment" class="flex justify-between items-center text-gray-700 hover:text-red-600 transition-colors py-2">
+                            <span>Entertainment</span>
+                            <span class="bg-gray-200 px-2 py-1 rounded text-xs">19</span>
+                        </a>
+                        <a href="/category/technology" class="flex justify-between items-center text-gray-700 hover:text-red-600 transition-colors py-2">
+                            <span>Technology</span>
+                            <span class="bg-gray-200 px-2 py-1 rounded text-xs">12</span>
+                        </a>
+                    </div>
+                </section>
+            </aside>
+        </div>
+    </main>
+
+    <!-- Footer -->
+    <footer class="bg-gray-900 text-white mt-12">
+        <div class="container mx-auto px-4 py-8">
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+                <!-- About -->
+                <div>
+                    <h3 class="text-xl font-bold mb-4 text-red-600">Bahadurgarh News</h3>
+                    <p class="text-gray-400 text-sm mb-4">
+                        Your trusted source for latest news and updates from India and around the world.
+                    </p>
+                    <div class="flex space-x-3">
+                        <a href="#" class="text-gray-400 hover:text-white transition-colors">
+                            <i class="fab fa-facebook-f"></i>
+                        </a>
+                        <a href="#" class="text-gray-400 hover:text-white transition-colors">
+                            <i class="fab fa-twitter"></i>
+                        </a>
+                        <a href="#" class="text-gray-400 hover:text-white transition-colors">
+                            <i class="fab fa-instagram"></i>
+                        </a>
+                        <a href="#" class="text-gray-400 hover:text-white transition-colors">
+                            <i class="fab fa-youtube"></i>
+                        </a>
+                    </div>
+                </div>
+
+                <!-- Quick Links -->
+                <div>
+                    <h4 class="text-lg font-semibold mb-4">News</h4>
+                    <ul class="space-y-2 text-sm">
+                        <li><a href="/category/india" class="text-gray-400 hover:text-white transition-colors">India</a></li>
+                        <li><a href="/category/world" class="text-gray-400 hover:text-white transition-colors">World</a></li>
+                        <li><a href="/category/business" class="text-gray-400 hover:text-white transition-colors">Business</a></li>
+                        <li><a href="/category/sports" class="text-gray-400 hover:text-white transition-colors">Sports</a></li>
+                    </ul>
+                </div>
+
+                <!-- Categories -->
+                <div>
+                    <h4 class="text-lg font-semibold mb-4">Categories</h4>
+                    <ul class="space-y-2 text-sm">
+                        <li><a href="/category/technology" class="text-gray-400 hover:text-white transition-colors">Technology</a></li>
+                        <li><a href="/category/health" class="text-gray-400 hover:text-white transition-colors">Health</a></li>
+                        <li><a href="/category/entertainment" class="text-gray-400 hover:text-white transition-colors">Entertainment</a></li>
+                        <li><a href="/category/education" class="text-gray-400 hover:text-white transition-colors">Education</a></li>
+                    </ul>
+                </div>
+
+                <!-- Services -->
+                <div>
+                    <h4 class="text-lg font-semibold mb-4">Services</h4>
+                    <ul class="space-y-2 text-sm">
+                        <li><a href="/epaper" class="text-gray-400 hover:text-white transition-colors">e-Paper</a></li>
+                        <li><a href="/newsletter" class="text-gray-400 hover:text-white transition-colors">Newsletter</a></li>
+                        <li><a href="/rss" class="text-gray-400 hover:text-white transition-colors">RSS Feeds</a></li>
+                        <li><a href="/contact" class="text-gray-400 hover:text-white transition-colors">Contact Us</a></li>
+                    </ul>
+                </div>
+            </div>
+
+            <div class="border-t border-gray-800 mt-8 pt-6">
+                <div class="flex flex-col md:flex-row justify-between items-center text-sm text-gray-400">
+                    <p>&copy; 2026 Bahadurgarh News. All rights reserved.</p>
+                    <div class="flex space-x-4 mt-4 md:mt-0">
+                        <a href="/privacy" class="hover:text-white transition-colors">Privacy Policy</a>
+                        <a href="/terms" class="hover:text-white transition-colors">Terms of Service</a>
+                        <a href="/sitemap" class="hover:text-white transition-colors">Sitemap</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <!-- JavaScript -->
+    <script src="/js/main.js"></script>
+    <script>
+        // Article-specific JavaScript
+        document.addEventListener('DOMContentLoaded', function() {
+            setupArticlePage();
+        });
+
+        function setupArticlePage() {
+            setupCommentForm();
+            setupNewsletterForm();
+            updateViewCount();
+        }
+
+        function setupCommentForm() {
+            const commentForm = document.getElementById('commentForm');
+            if (commentForm) {
+                commentForm.addEventListener('submit', async function(e) {
+                    e.preventDefault();
+                    
+                    const commentText = document.getElementById('commentText').value.trim();
+                    if (!commentText) return;
+
+                    try {
+                        const response = await fetch('/api/comments', {
+                            method: 'POST',
+                            headers: {
+                                'Content-Type': 'application/json',
+                            },
+                            body: JSON.stringify({
+                                articleId: '<%= article._id %>',
+                                content: commentText
+                            })
+                        });
+
+                        if (response.ok) {
+                            showNotification('Comment posted successfully!', 'success');
+                            document.getElementById('commentText').value = '';
+                            // Reload page to show new comment
+                            setTimeout(() => window.location.reload(), 1000);
+                        } else {
+                            showNotification('Failed to post comment', 'error');
+                        }
+                    } catch (error) {
+                        console.error('Error posting comment:', error);
+                        showNotification('Error posting comment', 'error');
+                    }
+                });
+            }
+        }
+
+        function updateViewCount() {
+            // Update view count asynchronously
+            fetch(`/api/articles/<%= article._id %>/views`, {
+                method: 'POST'
+            }).catch(error => console.log('View count update failed:', error));
+        }
+
+        function saveArticle(articleId) {
+            fetch('/api/save-article', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({ articleId })
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    showNotification('Article saved successfully!', 'success');
+                } else {
+                    showNotification(data.message || 'Failed to save article', 'error');
+                }
+            })
+            .catch(error => {
+                console.error('Error saving article:', error);
+                showNotification('Error saving article', 'error');
+            });
+        }
+
+        function shareOnLinkedIn() {
+            const url = window.location.href;
+            const title = document.title;
+            window.open(`https://www.linkedin.com/sharing/share-offsite/?url=${encodeURIComponent(url)}`, '_blank');
+        }
+
+        function copyLink() {
+            navigator.clipboard.writeText(window.location.href).then(() => {
+                showNotification('Link copied to clipboard!', 'success');
+            }).catch(() => {
+                showNotification('Failed to copy link', 'error');
+            });
+        }
+    </script>
+</body>
+</html>

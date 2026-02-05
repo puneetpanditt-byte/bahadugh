@@ -1,0 +1,510 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title><%= article ? 'Edit' : 'Create' %> Article - Admin Panel</title>
+    <link rel="stylesheet" href="/css/style.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- TinyMCE Editor -->
+    <script src="https://cdn.tiny.cloud/1/no-api-key/tinymce/6/tinymce.min.js" referrerpolicy="origin"></script>
+</head>
+<body class="bg-gray-100">
+    <div class="flex h-screen">
+        <!-- Sidebar -->
+        <aside class="admin-sidebar">
+            <div class="p-4">
+                <h2 class="text-2xl font-bold text-red-500 mb-8">Admin Panel</h2>
+                
+                <nav class="space-y-2">
+                    <a href="/admin/dashboard" class="flex items-center space-x-3 text-white hover:bg-gray-800 p-3 rounded transition-colors">
+                        <i class="fas fa-tachometer-alt"></i>
+                        <span>Dashboard</span>
+                    </a>
+                    <a href="/admin/articles" class="flex items-center space-x-3 text-white bg-gray-800 p-3 rounded transition-colors">
+                        <i class="fas fa-newspaper"></i>
+                        <span>Articles</span>
+                    </a>
+                    <a href="/admin/categories" class="flex items-center space-x-3 text-white hover:bg-gray-800 p-3 rounded transition-colors">
+                        <i class="fas fa-tags"></i>
+                        <span>Categories</span>
+                    </a>
+                    <a href="/admin/users" class="flex items-center space-x-3 text-white hover:bg-gray-800 p-3 rounded transition-colors">
+                        <i class="fas fa-users"></i>
+                        <span>Users</span>
+                    </a>
+                </nav>
+
+                <div class="mt-8 pt-8 border-t border-gray-700">
+                    <a href="/" class="flex items-center space-x-3 text-white hover:bg-gray-800 p-3 rounded transition-colors">
+                        <i class="fas fa-home"></i>
+                        <span>View Website</span>
+                    </a>
+                    <a href="/admin/logout" class="flex items-center space-x-3 text-white hover:bg-gray-800 p-3 rounded transition-colors">
+                        <i class="fas fa-sign-out-alt"></i>
+                        <span>Logout</span>
+                    </a>
+                </div>
+            </div>
+        </aside>
+
+        <!-- Main Content -->
+        <main class="flex-1 overflow-y-auto">
+            <!-- Top Bar -->
+            <header class="bg-white shadow-sm">
+                <div class="px-6 py-4 flex justify-between items-center">
+                    <div>
+                        <h1 class="text-2xl font-bold text-gray-800">
+                            <%= article ? 'Edit Article' : 'Create New Article' %>
+                        </h1>
+                        <p class="text-gray-600">
+                            <%= article ? 'Edit existing article' : 'Create and publish a new article' %>
+                        </p>
+                    </div>
+                    <div class="flex items-center space-x-4">
+                        <a href="/admin/articles" class="bg-gray-200 text-gray-700 px-4 py-2 rounded hover:bg-gray-300 transition-colors">
+                            <i class="fas fa-arrow-left mr-2"></i>
+                            Back to Articles
+                        </a>
+                    </div>
+                </div>
+            </header>
+
+            <!-- Article Form -->
+            <div class="p-6">
+                <form id="articleForm" class="space-y-6">
+                    <!-- Basic Information -->
+                    <div class="bg-white rounded-lg shadow-md p-6">
+                        <h3 class="text-lg font-semibold text-gray-800 mb-4">Basic Information</h3>
+                        
+                        <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                            <div>
+                                <label class="form-label">Article Title *</label>
+                                <input type="text" 
+                                       id="title"
+                                       name="title" 
+                                       value="<%= article ? article.title : '' %>"
+                                       placeholder="Enter article title" 
+                                       class="form-input"
+                                       required>
+                            </div>
+                            
+                            <div>
+                                <label class="form-label">Category *</label>
+                                <select id="category" name="category" class="form-input" required>
+                                    <option value="">Select Category</option>
+                                    <option value="india" <%= article && article.category === 'india' ? 'selected' : '' %>>India</option>
+                                    <option value="world" <%= article && article.category === 'world' ? 'selected' : '' %>>World</option>
+                                    <option value="business" <%= article && article.category === 'business' ? 'selected' : '' %>>Business</option>
+                                    <option value="sports" <%= article && article.category === 'sports' ? 'selected' : '' %>>Sports</option>
+                                    <option value="entertainment" <%= article && article.category === 'entertainment' ? 'selected' : '' %>>Entertainment</option>
+                                    <option value="technology" <%= article && article.category === 'technology' ? 'selected' : '' %>>Technology</option>
+                                    <option value="health" <%= article && article.category === 'health' ? 'selected' : '' %>>Health</option>
+                                </select>
+                            </div>
+                            
+                            <div>
+                                <label class="form-label">Author *</label>
+                                <input type="text" 
+                                       id="author"
+                                       name="author" 
+                                       value="<%= article ? article.author : (user ? user.name : '') %>"
+                                       placeholder="Author name" 
+                                       class="form-input"
+                                       required>
+                            </div>
+                            
+                            <div>
+                                <label class="form-label">Status</label>
+                                <select id="status" name="status" class="form-input">
+                                    <option value="draft" <%= article && article.status === 'draft' ? 'selected' : '' %>>Draft</option>
+                                    <option value="published" <%= article && article.status === 'published' ? 'selected' : (!article ? 'selected' : '') %>>Published</option>
+                                    <option value="archived" <%= article && article.status === 'archived' ? 'selected' : '' %>>Archived</option>
+                                </select>
+                            </div>
+                        </div>
+                        
+                        <div class="mt-6">
+                            <label class="form-label">Short Description *</label>
+                            <textarea id="shortDescription"
+                                      name="shortDescription" 
+                                      rows="3"
+                                      placeholder="Brief description of the article (appears in article listings)" 
+                                      class="form-input"
+                                      required><%= article ? article.shortDescription : '' %></textarea>
+                            <p class="text-sm text-gray-500 mt-1">
+                                <span id="charCount">0</span> characters (recommended: 150-200 characters)
+                            </p>
+                        </div>
+                    </div>
+
+                    <!-- Featured Image -->
+                    <div class="bg-white rounded-lg shadow-md p-6">
+                        <h3 class="text-lg font-semibold text-gray-800 mb-4">Featured Image</h3>
+                        
+                        <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                            <div>
+                                <label class="form-label">Image URL</label>
+                                <input type="url" 
+                                       id="imageUrl"
+                                       name="imageUrl" 
+                                       value="<%= article ? article.imageUrl : '' %>"
+                                       placeholder="https://example.com/image.jpg" 
+                                       class="form-input">
+                            </div>
+                            
+                            <div>
+                                <label class="form-label">Image Caption</label>
+                                <input type="text" 
+                                       id="imageCaption"
+                                       name="imageCaption" 
+                                       value="<%= article ? article.imageCaption : '' %>"
+                                       placeholder="Image caption/alt text" 
+                                       class="form-input">
+                            </div>
+                        </div>
+                        
+                        <div class="mt-6">
+                            <label class="form-label">Or Upload Image</label>
+                            <div class="border-2 border-dashed border-gray-300 rounded-lg p-6 text-center">
+                                <input type="file" 
+                                       id="imageUpload"
+                                       accept="image/*" 
+                                       class="hidden">
+                                <div id="imagePreview" class="mb-4">
+                                    <% if (article && article.imageUrl) { %>
+                                        <img src="<%= article.imageUrl %>" alt="Preview" class="max-h-48 mx-auto rounded">
+                                    <% } else { %>
+                                        <i class="fas fa-cloud-upload-alt text-4xl text-gray-400 mb-2"></i>
+                                        <p class="text-gray-600">Click to upload or drag and drop</p>
+                                    <% } %>
+                                </div>
+                                <button type="button" 
+                                        onclick="document.getElementById('imageUpload').click()"
+                                        class="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700 transition-colors">
+                                    <i class="fas fa-upload mr-2"></i>
+                                    Choose File
+                                </button>
+                                <p class="text-sm text-gray-500 mt-2">
+                                    PNG, JPG, GIF up to 5MB
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Content Editor -->
+                    <div class="bg-white rounded-lg shadow-md p-6">
+                        <h3 class="text-lg font-semibold text-gray-800 mb-4">Article Content *</h3>
+                        <textarea id="content" 
+                                  name="content" 
+                                  class="form-input"
+                                  rows="20"
+                                  placeholder="Write your article content here..."
+                                  required><%= article ? article.content : '' %></textarea>
+                    </div>
+
+                    <!-- Tags and Options -->
+                    <div class="bg-white rounded-lg shadow-md p-6">
+                        <h3 class="text-lg font-semibold text-gray-800 mb-4">Tags and Options</h3>
+                        
+                        <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                            <div>
+                                <label class="form-label">Tags</label>
+                                <input type="text" 
+                                       id="tags"
+                                       name="tags" 
+                                       value="<%= article ? article.tags.join(', ') : '' %>"
+                                       placeholder="politics, economy, breaking-news" 
+                                       class="form-input">
+                                <p class="text-sm text-gray-500 mt-1">
+                                    Separate tags with commas
+                                </p>
+                            </div>
+                            
+                            <div>
+                                <label class="form-label">SEO Meta Description</label>
+                                <textarea id="metaDescription"
+                                          name="metaDescription" 
+                                          rows="2"
+                                          placeholder="SEO meta description for search engines" 
+                                          class="form-input"><%= article ? article.metaDescription : '' %></textarea>
+                            </div>
+                        </div>
+                        
+                        <div class="mt-6 space-y-3">
+                            <label class="flex items-center">
+                                <input type="checkbox" 
+                                       id="featured"
+                                       name="featured" 
+                                       <%= article && article.featured ? 'checked' : '' %>
+                                       class="rounded mr-2">
+                                <span class="text-gray-700">Featured Article</span>
+                            </label>
+                            
+                            <label class="flex items-center">
+                                <input type="checkbox" 
+                                       id="breakingNews"
+                                       name="breakingNews" 
+                                       <%= article && article.breakingNews ? 'checked' : '' %>
+                                       class="rounded mr-2">
+                                <span class="text-gray-700">Breaking News</span>
+                            </label>
+                            
+                            <label class="flex items-center">
+                                <input type="checkbox" 
+                                       id="allowComments"
+                                       name="allowComments" 
+                                       <%= article ? (article.allowComments !== false ? 'checked' : '') : 'checked' %>
+                                       class="rounded mr-2">
+                                <span class="text-gray-700">Allow Comments</span>
+                            </label>
+                        </div>
+                    </div>
+
+                    <!-- Publishing Options -->
+                    <div class="bg-white rounded-lg shadow-md p-6">
+                        <h3 class="text-lg font-semibold text-gray-800 mb-4">Publishing Options</h3>
+                        
+                        <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                            <div>
+                                <label class="form-label">Publish Date</label>
+                                <input type="datetime-local" 
+                                       id="publishDate"
+                                       name="publishDate" 
+                                       value="<%= article ? new Date(article.publishDate || article.createdAt).toISOString().slice(0, 16) : new Date().toISOString().slice(0, 16) %>"
+                                       class="form-input">
+                            </div>
+                            
+                            <div>
+                                <label class="form-label">Reading Time (minutes)</label>
+                                <input type="number" 
+                                       id="readingTime"
+                                       name="readingTime" 
+                                       value="<%= article ? article.readingTime : '' %>"
+                                       placeholder="Auto-calculated if empty" 
+                                       min="1"
+                                       class="form-input">
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Form Actions -->
+                    <div class="flex justify-between items-center">
+                        <div class="space-x-3">
+                            <button type="button" 
+                                    onclick="saveDraft()"
+                                    class="bg-gray-600 text-white px-6 py-2 rounded hover:bg-gray-700 transition-colors">
+                                <i class="fas fa-save mr-2"></i>
+                                Save Draft
+                            </button>
+                            <button type="button" 
+                                    onclick="previewArticle()"
+                                    class="bg-blue-600 text-white px-6 py-2 rounded hover:bg-blue-700 transition-colors">
+                                <i class="fas fa-eye mr-2"></i>
+                                Preview
+                            </button>
+                        </div>
+                        
+                        <div class="space-x-3">
+                            <a href="/admin/articles" class="bg-gray-200 text-gray-700 px-6 py-2 rounded hover:bg-gray-300 transition-colors">
+                                Cancel
+                            </a>
+                            <button type="submit" class="bg-red-600 text-white px-6 py-2 rounded hover:bg-red-700 transition-colors">
+                                <i class="fas fa-check mr-2"></i>
+                                <%= article ? 'Update Article' : 'Publish Article' %>
+                            </button>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </main>
+    </div>
+
+    <!-- JavaScript -->
+    <script src="/js/admin.js"></script>
+    <script>
+        // Initialize TinyMCE
+        tinymce.init({
+            selector: '#content',
+            height: 500,
+            plugins: [
+                'advlist', 'autolink', 'lists', 'link', 'image', 'charmap', 'preview',
+                'anchor', 'searchreplace', 'visualblocks', 'code', 'fullscreen',
+                'insertdatetime', 'media', 'table', 'help', 'wordcount'
+            ],
+            toolbar: 'undo redo | blocks | ' +
+                'bold italic forecolor | alignleft aligncenter ' +
+                'alignright alignjustify | bullist numlist outdent indent | ' +
+                'removeformat | help',
+            content_style: 'body { font-family:Inter,sans-serif; font-size:14px }'
+        });
+
+        document.addEventListener('DOMContentLoaded', function() {
+            setupArticleForm();
+        });
+
+        function setupArticleForm() {
+            setupCharCounter();
+            setupImageUpload();
+            setupFormSubmission();
+        }
+
+        function setupCharCounter() {
+            const shortDesc = document.getElementById('shortDescription');
+            const charCount = document.getElementById('charCount');
+            
+            shortDesc.addEventListener('input', function() {
+                charCount.textContent = this.value.length;
+            });
+            
+            // Initialize counter
+            charCount.textContent = shortDesc.value.length;
+        }
+
+        function setupImageUpload() {
+            const imageUpload = document.getElementById('imageUpload');
+            const imagePreview = document.getElementById('imagePreview');
+            const imageUrl = document.getElementById('imageUrl');
+            
+            imageUpload.addEventListener('change', function(e) {
+                const file = e.target.files[0];
+                if (file) {
+                    if (file.size > 5 * 1024 * 1024) {
+                        showNotification('File size must be less than 5MB', 'error');
+                        return;
+                    }
+                    
+                    const reader = new FileReader();
+                    reader.onload = function(e) {
+                        imagePreview.innerHTML = `<img src="${e.target.result}" alt="Preview" class="max-h-48 mx-auto rounded">`;
+                        // In a real implementation, you would upload the file and set the URL
+                        // imageUrl.value = 'uploaded-file-url';
+                    };
+                    reader.readAsDataURL(file);
+                }
+            });
+        }
+
+        function setupFormSubmission() {
+            const form = document.getElementById('articleForm');
+            
+            form.addEventListener('submit', function(e) {
+                e.preventDefault();
+                
+                // Get content from TinyMCE
+                const content = tinymce.get('content').getContent();
+                document.getElementById('content').value = content;
+                
+                const formData = new FormData(form);
+                const data = Object.fromEntries(formData);
+                
+                // Process tags
+                if (data.tags) {
+                    data.tags = data.tags.split(',').map(tag => tag.trim()).filter(tag => tag);
+                }
+                
+                // Convert checkboxes to boolean
+                data.featured = !!data.featured;
+                data.breakingNews = !!data.breakingNews;
+                data.allowComments = !!data.allowComments;
+                
+                const articleId = '<%= article ? article._id : "" %>';
+                const url = articleId ? `/admin/articles/${articleId}` : '/admin/articles';
+                const method = articleId ? 'PUT' : 'POST';
+                
+                fetch(url, {
+                    method: method,
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify(data)
+                })
+                .then(response => response.json())
+                .then(result => {
+                    if (result.success) {
+                        showNotification(
+                            articleId ? 'Article updated successfully!' : 'Article created successfully!',
+                            'success'
+                        );
+                        setTimeout(() => {
+                            window.location.href = '/admin/articles';
+                        }, 1500);
+                    } else {
+                        showNotification(result.message || 'Failed to save article', 'error');
+                    }
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    showNotification('An error occurred while saving', 'error');
+                });
+            });
+        }
+
+        function saveDraft() {
+            document.getElementById('status').value = 'draft';
+            document.getElementById('articleForm').dispatchEvent(new Event('submit'));
+        }
+
+        function previewArticle() {
+            const form = document.getElementById('articleForm');
+            const formData = new FormData(form);
+            const data = Object.fromEntries(formData);
+            
+            // Get content from TinyMCE
+            data.content = tinymce.get('content').getContent();
+            
+            // Open preview in new window
+            const previewWindow = window.open('', '_blank');
+            previewWindow.document.write(`
+                <!DOCTYPE html>
+                <html>
+                <head>
+                    <title>Article Preview</title>
+                    <link rel="stylesheet" href="/css/style.css">
+                </head>
+                <body class="bg-gray-50 p-8">
+                    <div class="max-w-4xl mx-auto bg-white rounded-lg shadow-md p-8">
+                        <h1 class="text-3xl font-bold mb-4">${data.title}</h1>
+                        <div class="text-gray-600 mb-4">
+                            <p>By ${data.author} | ${data.category} | ${new Date().toLocaleDateString()}</p>
+                        </div>
+                        ${data.imageUrl ? `<img src="${data.imageUrl}" alt="${data.imageCaption || ''}" class="w-full h-auto rounded mb-6">` : ''}
+                        <div class="prose max-w-none">
+                            ${data.content}
+                        </div>
+                    </div>
+                </body>
+                </html>
+            `);
+        }
+
+        function showNotification(message, type = 'info') {
+            const notification = document.createElement('div');
+            notification.className = `fixed top-4 right-4 z-50 p-4 rounded-lg shadow-lg transform translate-x-full transition-transform duration-300 ${
+                type === 'success' ? 'bg-green-600 text-white' :
+                type === 'error' ? 'bg-red-600 text-white' :
+                'bg-blue-600 text-white'
+            }`;
+            notification.textContent = message;
+            
+            document.body.appendChild(notification);
+            
+            setTimeout(() => {
+                notification.style.transform = 'translateX(0)';
+            }, 100);
+            
+            setTimeout(() => {
+                notification.style.transform = 'translateX(100%)';
+                setTimeout(() => {
+                    if (notification.parentNode) {
+                        document.body.removeChild(notification);
+                    }
+                }, 300);
+            }, 3000);
+        }
+    </script>
+</body>
+</html>

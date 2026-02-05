@@ -1,0 +1,453 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Dashboard - Bahadurgarh News</title>
+    <link rel="stylesheet" href="/css/style.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body class="bg-gray-100">
+    <div class="flex h-screen">
+        <!-- Sidebar -->
+        <aside class="admin-sidebar">
+            <div class="p-4">
+                <h2 class="text-2xl font-bold text-red-500 mb-8">Admin Panel</h2>
+                
+                <nav class="space-y-2">
+                    <a href="/admin/dashboard" class="flex items-center space-x-3 text-white hover:bg-gray-800 p-3 rounded transition-colors">
+                        <i class="fas fa-tachometer-alt"></i>
+                        <span>Dashboard</span>
+                    </a>
+                    <a href="/admin/articles" class="flex items-center space-x-3 text-white hover:bg-gray-800 p-3 rounded transition-colors">
+                        <i class="fas fa-newspaper"></i>
+                        <span>Articles</span>
+                        <span class="ml-auto bg-red-600 px-2 py-1 rounded text-xs"><%= stats.totalArticles %></span>
+                    </a>
+                    <a href="/admin/categories" class="flex items-center space-x-3 text-white hover:bg-gray-800 p-3 rounded transition-colors">
+                        <i class="fas fa-tags"></i>
+                        <span>Categories</span>
+                    </a>
+                    <a href="/admin/users" class="flex items-center space-x-3 text-white hover:bg-gray-800 p-3 rounded transition-colors">
+                        <i class="fas fa-users"></i>
+                        <span>Users</span>
+                        <span class="ml-auto bg-blue-600 px-2 py-1 rounded text-xs"><%= stats.totalUsers %></span>
+                    </a>
+                    <a href="/admin/comments" class="flex items-center space-x-3 text-white hover:bg-gray-800 p-3 rounded transition-colors">
+                        <i class="fas fa-comments"></i>
+                        <span>Comments</span>
+                        <span class="ml-auto bg-yellow-600 px-2 py-1 rounded text-xs"><%= stats.totalComments %></span>
+                    </a>
+                    <a href="/admin/media" class="flex items-center space-x-3 text-white hover:bg-gray-800 p-3 rounded transition-colors">
+                        <i class="fas fa-images"></i>
+                        <span>Media Library</span>
+                    </a>
+                    <a href="/admin/settings" class="flex items-center space-x-3 text-white hover:bg-gray-800 p-3 rounded transition-colors">
+                        <i class="fas fa-cog"></i>
+                        <span>Settings</span>
+                    </a>
+                </nav>
+
+                <div class="mt-8 pt-8 border-t border-gray-700">
+                    <a href="/" class="flex items-center space-x-3 text-white hover:bg-gray-800 p-3 rounded transition-colors">
+                        <i class="fas fa-home"></i>
+                        <span>View Website</span>
+                    </a>
+                    <a href="/admin/logout" class="flex items-center space-x-3 text-white hover:bg-gray-800 p-3 rounded transition-colors">
+                        <i class="fas fa-sign-out-alt"></i>
+                        <span>Logout</span>
+                    </a>
+                </div>
+            </div>
+        </aside>
+
+        <!-- Main Content -->
+        <main class="flex-1 overflow-y-auto">
+            <!-- Top Bar -->
+            <header class="bg-white shadow-sm">
+                <div class="px-6 py-4 flex justify-between items-center">
+                    <div>
+                        <h1 class="text-2xl font-bold text-gray-800">Dashboard</h1>
+                        <p class="text-gray-600">Welcome back, <%= user.name %>!</p>
+                    </div>
+                    <div class="flex items-center space-x-4">
+                        <button class="relative text-gray-600 hover:text-gray-800">
+                            <i class="fas fa-bell text-xl"></i>
+                            <span class="absolute -top-1 -right-1 bg-red-600 text-white text-xs rounded-full w-5 h-5 flex items-center justify-center">3</span>
+                        </button>
+                        <div class="flex items-center space-x-3">
+                            <img src="https://via.placeholder.com/40x40/333/FFFFFF?text=Admin" 
+                                 alt="Admin" 
+                                 class="w-10 h-10 rounded-full">
+                            <div>
+                                <p class="text-sm font-medium text-gray-800"><%= user.name %></p>
+                                <p class="text-xs text-gray-600">Administrator</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </header>
+
+            <!-- Dashboard Content -->
+            <div class="p-6">
+                <!-- Stats Cards -->
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+                    <div class="bg-white rounded-lg shadow-md p-6">
+                        <div class="flex items-center justify-between">
+                            <div>
+                                <p class="text-sm text-gray-600 mb-1">Total Articles</p>
+                                <p class="text-2xl font-bold text-gray-800"><%= stats.totalArticles %></p>
+                                <p class="text-xs text-green-600 mt-2">
+                                    <i class="fas fa-arrow-up mr-1"></i>
+                                    +12% from last month
+                                </p>
+                            </div>
+                            <div class="bg-blue-100 p-3 rounded-full">
+                                <i class="fas fa-newspaper text-blue-600 text-xl"></i>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="bg-white rounded-lg shadow-md p-6">
+                        <div class="flex items-center justify-between">
+                            <div>
+                                <p class="text-sm text-gray-600 mb-1">Total Users</p>
+                                <p class="text-2xl font-bold text-gray-800"><%= stats.totalUsers %></p>
+                                <p class="text-xs text-green-600 mt-2">
+                                    <i class="fas fa-arrow-up mr-1"></i>
+                                    +8% from last month
+                                </p>
+                            </div>
+                            <div class="bg-green-100 p-3 rounded-full">
+                                <i class="fas fa-users text-green-600 text-xl"></i>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="bg-white rounded-lg shadow-md p-6">
+                        <div class="flex items-center justify-between">
+                            <div>
+                                <p class="text-sm text-gray-600 mb-1">Total Comments</p>
+                                <p class="text-2xl font-bold text-gray-800"><%= stats.totalComments %></p>
+                                <p class="text-xs text-red-600 mt-2">
+                                    <i class="fas fa-arrow-down mr-1"></i>
+                                    -3% from last month
+                                </p>
+                            </div>
+                            <div class="bg-yellow-100 p-3 rounded-full">
+                                <i class="fas fa-comments text-yellow-600 text-xl"></i>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="bg-white rounded-lg shadow-md p-6">
+                        <div class="flex items-center justify-between">
+                            <div>
+                                <p class="text-sm text-gray-600 mb-1">Total Views</p>
+                                <p class="text-2xl font-bold text-gray-800"><%= stats.totalViews %></p>
+                                <p class="text-xs text-green-600 mt-2">
+                                    <i class="fas fa-arrow-up mr-1"></i>
+                                    +25% from last month
+                                </p>
+                            </div>
+                            <div class="bg-red-100 p-3 rounded-full">
+                                <i class="fas fa-eye text-red-600 text-xl"></i>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Charts Section -->
+                <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
+                    <!-- Article Views Chart -->
+                    <div class="bg-white rounded-lg shadow-md p-6">
+                        <h3 class="text-lg font-semibold text-gray-800 mb-4">Article Views (Last 7 Days)</h3>
+                        <canvas id="viewsChart" width="400" height="200"></canvas>
+                    </div>
+
+                    <!-- Category Distribution -->
+                    <div class="bg-white rounded-lg shadow-md p-6">
+                        <h3 class="text-lg font-semibold text-gray-800 mb-4">Category Distribution</h3>
+                        <canvas id="categoryChart" width="400" height="200"></canvas>
+                    </div>
+                </div>
+
+                <!-- Recent Activities & Quick Actions -->
+                <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                    <!-- Recent Activities -->
+                    <div class="lg:col-span-2 bg-white rounded-lg shadow-md p-6">
+                        <h3 class="text-lg font-semibold text-gray-800 mb-4">Recent Activities</h3>
+                        <div class="space-y-4">
+                            <% recentActivities.forEach(activity => { %>
+                                <div class="flex items-start space-x-3 pb-4 border-b last:border-b-0">
+                                    <div class="flex-shrink-0">
+                                        <% if (activity.type === 'article_created') { %>
+                                            <div class="bg-blue-100 p-2 rounded-full">
+                                                <i class="fas fa-plus text-blue-600 text-sm"></i>
+                                            </div>
+                                        <% } else if (activity.type === 'article_updated') { %>
+                                            <div class="bg-yellow-100 p-2 rounded-full">
+                                                <i class="fas fa-edit text-yellow-600 text-sm"></i>
+                                            </div>
+                                        <% } else if (activity.type === 'user_registered') { %>
+                                            <div class="bg-green-100 p-2 rounded-full">
+                                                <i class="fas fa-user-plus text-green-600 text-sm"></i>
+                                            </div>
+                                        <% } else if (activity.type === 'comment_added') { %>
+                                            <div class="bg-purple-100 p-2 rounded-full">
+                                                <i class="fas fa-comment text-purple-600 text-sm"></i>
+                                            </div>
+                                        <% } %>
+                                    </div>
+                                    <div class="flex-1">
+                                        <p class="text-sm text-gray-800"><%= activity.description %></p>
+                                        <p class="text-xs text-gray-500 mt-1">
+                                            <%= new Date(activity.createdAt).toLocaleString() %>
+                                        </p>
+                                    </div>
+                                </div>
+                            <% }) %>
+                        </div>
+                    </div>
+
+                    <!-- Quick Actions -->
+                    <div class="bg-white rounded-lg shadow-md p-6">
+                        <h3 class="text-lg font-semibold text-gray-800 mb-4">Quick Actions</h3>
+                        <div class="space-y-3">
+                            <a href="/admin/articles/new" class="block w-full bg-red-600 text-white text-center py-3 px-4 rounded hover:bg-red-700 transition-colors">
+                                <i class="fas fa-plus mr-2"></i>
+                                Create New Article
+                            </a>
+                            <a href="/admin/users/new" class="block w-full bg-blue-600 text-white text-center py-3 px-4 rounded hover:bg-blue-700 transition-colors">
+                                <i class="fas fa-user-plus mr-2"></i>
+                                Add New User
+                            </a>
+                            <a href="/admin/categories/new" class="block w-full bg-green-600 text-white text-center py-3 px-4 rounded hover:bg-green-700 transition-colors">
+                                <i class="fas fa-tag mr-2"></i>
+                                Add Category
+                            </a>
+                            <button onclick="exportData()" class="block w-full bg-gray-600 text-white text-center py-3 px-4 rounded hover:bg-gray-700 transition-colors">
+                                <i class="fas fa-download mr-2"></i>
+                                Export Data
+                            </button>
+                            <button onclick="clearCache()" class="block w-full bg-yellow-600 text-white text-center py-3 px-4 rounded hover:bg-yellow-700 transition-colors">
+                                <i class="fas fa-broom mr-2"></i>
+                                Clear Cache
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Latest Articles Table -->
+                <div class="bg-white rounded-lg shadow-md p-6 mt-8">
+                    <div class="flex justify-between items-center mb-4">
+                        <h3 class="text-lg font-semibold text-gray-800">Latest Articles</h3>
+                        <a href="/admin/articles" class="text-red-600 hover:text-red-700 font-medium">View All →</a>
+                    </div>
+                    <div class="overflow-x-auto">
+                        <table class="w-full text-sm">
+                            <thead>
+                                <tr class="border-b">
+                                    <th class="text-left py-3 px-4">Title</th>
+                                    <th class="text-left py-3 px-4">Category</th>
+                                    <th class="text-left py-3 px-4">Author</th>
+                                    <th class="text-left py-3 px-4">Status</th>
+                                    <th class="text-left py-3 px-4">Views</th>
+                                    <th class="text-left py-3 px-4">Date</th>
+                                    <th class="text-left py-3 px-4">Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <% latestArticles.forEach(article => { %>
+                                    <tr class="border-b hover:bg-gray-50">
+                                        <td class="py-3 px-4">
+                                            <div class="max-w-xs truncate">
+                                                <%= article.title %>
+                                            </div>
+                                        </td>
+                                        <td class="py-3 px-4">
+                                            <span class="bg-gray-100 text-gray-800 px-2 py-1 rounded text-xs">
+                                                <%= article.category %>
+                                            </span>
+                                        </td>
+                                        <td class="py-3 px-4"><%= article.author %></td>
+                                        <td class="py-3 px-4">
+                                            <% if (article.status === 'published') { %>
+                                                <span class="bg-green-100 text-green-800 px-2 py-1 rounded text-xs">
+                                                    Published
+                                                </span>
+                                            <% } else if (article.status === 'draft') { %>
+                                                <span class="bg-yellow-100 text-yellow-800 px-2 py-1 rounded text-xs">
+                                                    Draft
+                                                </span>
+                                            <% } else { %>
+                                                <span class="bg-gray-100 text-gray-800 px-2 py-1 rounded text-xs">
+                                                    Archived
+                                                </span>
+                                            <% } %>
+                                        </td>
+                                        <td class="py-3 px-4"><%= article.views || 0 %></td>
+                                        <td class="py-3 px-4">
+                                            <%= new Date(article.createdAt).toLocaleDateString() %>
+                                        </td>
+                                        <td class="py-3 px-4">
+                                            <div class="flex space-x-2">
+                                                <a href="/admin/articles/edit/<%= article._id %>" 
+                                                   class="text-blue-600 hover:text-blue-800">
+                                                    <i class="fas fa-edit"></i>
+                                                </a>
+                                                <a href="/article/<%= article._id %>" 
+                                                   class="text-green-600 hover:text-green-800" target="_blank">
+                                                    <i class="fas fa-eye"></i>
+                                                </a>
+                                                <button onclick="deleteArticle('<%= article._id %>')" 
+                                                        class="text-red-600 hover:text-red-800">
+                                                    <i class="fas fa-trash"></i>
+                                                </button>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                <% }) %>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <!-- JavaScript -->
+    <script src="/js/admin.js"></script>
+    <script>
+        // Dashboard Charts
+        document.addEventListener('DOMContentLoaded', function() {
+            setupCharts();
+        });
+
+        function setupCharts() {
+            // Views Chart
+            const viewsCtx = document.getElementById('viewsChart').getContext('2d');
+            new Chart(viewsCtx, {
+                type: 'line',
+                data: {
+                    labels: ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'],
+                    datasets: [{
+                        label: 'Article Views',
+                        data: [1200, 1900, 1500, 2500, 2200, 3000, 2800],
+                        borderColor: 'rgb(239, 68, 68)',
+                        backgroundColor: 'rgba(239, 68, 68, 0.1)',
+                        tension: 0.4
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            display: false
+                        }
+                    },
+                    scales: {
+                        y: {
+                            beginAtZero: true
+                        }
+                    }
+                }
+            });
+
+            // Category Chart
+            const categoryCtx = document.getElementById('categoryChart').getContext('2d');
+            new Chart(categoryCtx, {
+                type: 'doughnut',
+                data: {
+                    labels: ['India', 'World', 'Business', 'Sports', 'Entertainment', 'Technology'],
+                    datasets: [{
+                        data: [30, 20, 15, 18, 10, 7],
+                        backgroundColor: [
+                            '#ef4444',
+                            '#3b82f6',
+                            '#10b981',
+                            '#f59e0b',
+                            '#8b5cf6',
+                            '#ec4899'
+                        ]
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            position: 'bottom'
+                        }
+                    }
+                }
+            });
+        }
+
+        function exportData() {
+            if (confirm('Are you sure you want to export all data?')) {
+                window.location.href = '/admin/export/data';
+            }
+        }
+
+        function clearCache() {
+            if (confirm('Are you sure you want to clear the cache?')) {
+                fetch('/admin/clear-cache', { method: 'POST' })
+                    .then(response => response.json())
+                    .then(data => {
+                        if (data.success) {
+                            showNotification('Cache cleared successfully!', 'success');
+                        } else {
+                            showNotification('Failed to clear cache', 'error');
+                        }
+                    });
+            }
+        }
+
+        function deleteArticle(articleId) {
+            if (confirm('Are you sure you want to delete this article?')) {
+                fetch(`/admin/articles/${articleId}`, { method: 'DELETE' })
+                    .then(response => response.json())
+                    .then(data => {
+                        if (data.success) {
+                            showNotification('Article deleted successfully!', 'success');
+                            setTimeout(() => window.location.reload(), 1000);
+                        } else {
+                            showNotification('Failed to delete article', 'error');
+                        }
+                    });
+            }
+        }
+
+        function showNotification(message, type = 'info') {
+            const notification = document.createElement('div');
+            notification.className = `fixed top-4 right-4 z-50 p-4 rounded-lg shadow-lg transform translate-x-full transition-transform duration-300 ${
+                type === 'success' ? 'bg-green-600 text-white' :
+                type === 'error' ? 'bg-red-600 text-white' :
+                'bg-blue-600 text-white'
+            }`;
+            notification.textContent = message;
+            
+            document.body.appendChild(notification);
+            
+            setTimeout(() => {
+                notification.style.transform = 'translateX(0)';
+            }, 100);
+            
+            setTimeout(() => {
+                notification.style.transform = 'translateX(100%)';
+                setTimeout(() => {
+                    if (notification.parentNode) {
+                        document.body.removeChild(notification);
+                    }
+                }, 300);
+            }, 3000);
+        }
+    </script>
+</body>
+</html>

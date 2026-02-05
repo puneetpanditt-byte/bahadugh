@@ -1,0 +1,512 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Articles Management - Admin Panel</title>
+    <link rel="stylesheet" href="/css/style.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body class="bg-gray-100">
+    <div class="flex h-screen">
+        <!-- Sidebar -->
+        <aside class="admin-sidebar">
+            <div class="p-4">
+                <h2 class="text-2xl font-bold text-red-500 mb-8">Admin Panel</h2>
+                
+                <nav class="space-y-2">
+                    <a href="/admin/dashboard" class="flex items-center space-x-3 text-white hover:bg-gray-800 p-3 rounded transition-colors">
+                        <i class="fas fa-tachometer-alt"></i>
+                        <span>Dashboard</span>
+                    </a>
+                    <a href="/admin/articles" class="flex items-center space-x-3 text-white bg-gray-800 p-3 rounded transition-colors">
+                        <i class="fas fa-newspaper"></i>
+                        <span>Articles</span>
+                    </a>
+                    <a href="/admin/categories" class="flex items-center space-x-3 text-white hover:bg-gray-800 p-3 rounded transition-colors">
+                        <i class="fas fa-tags"></i>
+                        <span>Categories</span>
+                    </a>
+                    <a href="/admin/users" class="flex items-center space-x-3 text-white hover:bg-gray-800 p-3 rounded transition-colors">
+                        <i class="fas fa-users"></i>
+                        <span>Users</span>
+                    </a>
+                    <a href="/admin/comments" class="flex items-center space-x-3 text-white hover:bg-gray-800 p-3 rounded transition-colors">
+                        <i class="fas fa-comments"></i>
+                        <span>Comments</span>
+                    </a>
+                </nav>
+
+                <div class="mt-8 pt-8 border-t border-gray-700">
+                    <a href="/" class="flex items-center space-x-3 text-white hover:bg-gray-800 p-3 rounded transition-colors">
+                        <i class="fas fa-home"></i>
+                        <span>View Website</span>
+                    </a>
+                    <a href="/admin/logout" class="flex items-center space-x-3 text-white hover:bg-gray-800 p-3 rounded transition-colors">
+                        <i class="fas fa-sign-out-alt"></i>
+                        <span>Logout</span>
+                    </a>
+                </div>
+            </div>
+        </aside>
+
+        <!-- Main Content -->
+        <main class="flex-1 overflow-y-auto">
+            <!-- Top Bar -->
+            <header class="bg-white shadow-sm">
+                <div class="px-6 py-4 flex justify-between items-center">
+                    <div>
+                        <h1 class="text-2xl font-bold text-gray-800">Articles Management</h1>
+                        <p class="text-gray-600">Manage your news articles</p>
+                    </div>
+                    <div class="flex items-center space-x-4">
+                        <a href="/admin/articles/new" class="bg-red-600 text-white px-4 py-2 rounded hover:bg-red-700 transition-colors">
+                            <i class="fas fa-plus mr-2"></i>
+                            New Article
+                        </a>
+                    </div>
+                </div>
+            </header>
+
+            <!-- Filters and Search -->
+            <div class="p-6">
+                <div class="bg-white rounded-lg shadow-md p-4 mb-6">
+                    <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">Search</label>
+                            <input type="text" 
+                                   id="searchInput"
+                                   placeholder="Search articles..." 
+                                   class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-red-500">
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">Category</label>
+                            <select id="categoryFilter" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-red-500">
+                                <option value="">All Categories</option>
+                                <option value="india">India</option>
+                                <option value="world">World</option>
+                                <option value="business">Business</option>
+                                <option value="sports">Sports</option>
+                                <option value="entertainment">Entertainment</option>
+                                <option value="technology">Technology</option>
+                                <option value="health">Health</option>
+                            </select>
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">Status</label>
+                            <select id="statusFilter" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-red-500">
+                                <option value="">All Status</option>
+                                <option value="published">Published</option>
+                                <option value="draft">Draft</option>
+                                <option value="archived">Archived</option>
+                            </select>
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">Date Range</label>
+                            <select id="dateFilter" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-red-500">
+                                <option value="">All Time</option>
+                                <option value="today">Today</option>
+                                <option value="week">This Week</option>
+                                <option value="month">This Month</option>
+                                <option value="year">This Year</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="flex justify-end mt-4 space-x-2">
+                        <button onclick="resetFilters()" class="bg-gray-200 text-gray-700 px-4 py-2 rounded hover:bg-gray-300 transition-colors">
+                            <i class="fas fa-redo mr-2"></i>
+                            Reset
+                        </button>
+                        <button onclick="applyFilters()" class="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700 transition-colors">
+                            <i class="fas fa-filter mr-2"></i>
+                            Apply Filters
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Articles Table -->
+                <div class="bg-white rounded-lg shadow-md overflow-hidden">
+                    <div class="overflow-x-auto">
+                        <table class="w-full">
+                            <thead class="bg-gray-50">
+                                <tr>
+                                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                        <input type="checkbox" id="selectAll" class="rounded">
+                                    </th>
+                                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                        Article
+                                    </th>
+                                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                        Category
+                                    </th>
+                                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                        Author
+                                    </th>
+                                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                        Status
+                                    </th>
+                                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                        Views
+                                    </th>
+                                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                        Date
+                                    </th>
+                                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                        Actions
+                                    </th>
+                                </tr>
+                            </thead>
+                            <tbody class="bg-white divide-y divide-gray-200">
+                                <% articles.forEach(article => { %>
+                                    <tr class="hover:bg-gray-50">
+                                        <td class="px-6 py-4 whitespace-nowrap">
+                                            <input type="checkbox" class="article-checkbox rounded" value="<%= article._id %>">
+                                        </td>
+                                        <td class="px-6 py-4">
+                                            <div class="flex items-center">
+                                                <img src="<%= article.imageUrl || 'https://via.placeholder.com/60x60/333/FFFFFF?text=No+Image' %>" 
+                                                     alt="<%= article.title %>" 
+                                                     class="w-12 h-12 rounded object-cover mr-3">
+                                                <div>
+                                                    <div class="text-sm font-medium text-gray-900 max-w-xs truncate">
+                                                        <%= article.title %>
+                                                    </div>
+                                                    <div class="text-sm text-gray-500 max-w-xs truncate">
+                                                        <%= article.shortDescription %>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </td>
+                                        <td class="px-6 py-4 whitespace-nowrap">
+                                            <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-blue-100 text-blue-800">
+                                                <%= article.category %>
+                                            </span>
+                                        </td>
+                                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                                            <%= article.author %>
+                                        </td>
+                                        <td class="px-6 py-4 whitespace-nowrap">
+                                            <% if (article.status === 'published') { %>
+                                                <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-green-100 text-green-800">
+                                                    Published
+                                                </span>
+                                            <% } else if (article.status === 'draft') { %>
+                                                <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-yellow-100 text-yellow-800">
+                                                    Draft
+                                                </span>
+                                            <% } else { %>
+                                                <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-gray-100 text-gray-800">
+                                                    Archived
+                                                </span>
+                                            <% } %>
+                                        </td>
+                                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                                            <%= article.views || 0 %>
+                                        </td>
+                                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                                            <%= new Date(article.createdAt).toLocaleDateString() %>
+                                        </td>
+                                        <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">
+                                            <div class="flex space-x-2">
+                                                <a href="/admin/articles/edit/<%= article._id %>" 
+                                                   class="text-blue-600 hover:text-blue-900" title="Edit">
+                                                    <i class="fas fa-edit"></i>
+                                                </a>
+                                                <a href="/article/<%= article._id %>" 
+                                                   class="text-green-600 hover:text-green-900" target="_blank" title="View">
+                                                    <i class="fas fa-eye"></i>
+                                                </a>
+                                                <button onclick="duplicateArticle('<%= article._id %>')" 
+                                                        class="text-purple-600 hover:text-purple-900" title="Duplicate">
+                                                    <i class="fas fa-copy"></i>
+                                                </button>
+                                                <button onclick="deleteArticle('<%= article._id %>')" 
+                                                        class="text-red-600 hover:text-red-900" title="Delete">
+                                                    <i class="fas fa-trash"></i>
+                                                </button>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                <% }) %>
+                            </tbody>
+                        </table>
+                    </div>
+
+                    <!-- Pagination -->
+                    <div class="bg-gray-50 px-4 py-3 flex items-center justify-between border-t border-gray-200 sm:px-6">
+                        <div class="flex-1 flex justify-between sm:hidden">
+                            <a href="#" class="relative inline-flex items-center px-4 py-2 border border-gray-300 text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50">
+                                Previous
+                            </a>
+                            <a href="#" class="ml-3 relative inline-flex items-center px-4 py-2 border border-gray-300 text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50">
+                                Next
+                            </a>
+                        </div>
+                        <div class="hidden sm:flex-1 sm:flex sm:items-center sm:justify-between">
+                            <div>
+                                <p class="text-sm text-gray-700">
+                                    Showing
+                                    <span class="font-medium">1</span>
+                                    to
+                                    <span class="font-medium"><%= articles.length %></span>
+                                    of
+                                    <span class="font-medium"><%= totalArticles %></span>
+                                    results
+                                </p>
+                            </div>
+                            <div>
+                                <nav class="relative z-0 inline-flex rounded-md shadow-sm -space-x-px" aria-label="Pagination">
+                                    <a href="#" class="relative inline-flex items-center px-2 py-2 rounded-l-md border border-gray-300 bg-white text-sm font-medium text-gray-500 hover:bg-gray-50">
+                                        <span class="sr-only">Previous</span>
+                                        <i class="fas fa-chevron-left"></i>
+                                    </a>
+                                    <a href="#" aria-current="page" class="relative inline-flex items-center px-4 py-2 border border-red-500 bg-red-50 text-sm font-medium text-red-600">
+                                        1
+                                    </a>
+                                    <a href="#" class="relative inline-flex items-center px-4 py-2 border border-gray-300 bg-white text-sm font-medium text-gray-700 hover:bg-gray-50">
+                                        2
+                                    </a>
+                                    <a href="#" class="relative inline-flex items-center px-4 py-2 border border-gray-300 bg-white text-sm font-medium text-gray-700 hover:bg-gray-50">
+                                        3
+                                    </a>
+                                    <a href="#" class="relative inline-flex items-center px-2 py-2 rounded-r-md border border-gray-300 bg-white text-sm font-medium text-gray-500 hover:bg-gray-50">
+                                        <span class="sr-only">Next</span>
+                                        <i class="fas fa-chevron-right"></i>
+                                    </a>
+                                </nav>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Bulk Actions -->
+                <div class="mt-4 bg-white rounded-lg shadow-md p-4">
+                    <div class="flex items-center justify-between">
+                        <div class="flex items-center space-x-4">
+                            <span class="text-sm text-gray-700">
+                                <span id="selectedCount">0</span> articles selected
+                            </span>
+                            <select id="bulkAction" class="px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-red-500">
+                                <option value="">Bulk Actions</option>
+                                <option value="publish">Publish</option>
+                                <option value="draft">Set as Draft</option>
+                                <option value="archive">Archive</option>
+                                <option value="delete">Delete</option>
+                            </select>
+                            <button onclick="applyBulkAction()" class="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700 transition-colors">
+                                Apply
+                            </button>
+                        </div>
+                        <div class="text-sm text-gray-600">
+                            Total: <%= totalArticles %> articles
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <!-- JavaScript -->
+    <script src="/js/admin.js"></script>
+    <script>
+        // Article Management JavaScript
+        document.addEventListener('DOMContentLoaded', function() {
+            setupArticleManagement();
+        });
+
+        function setupArticleManagement() {
+            setupCheckboxes();
+            setupFilters();
+            setupSearch();
+        }
+
+        function setupCheckboxes() {
+            const selectAll = document.getElementById('selectAll');
+            const checkboxes = document.querySelectorAll('.article-checkbox');
+            const selectedCount = document.getElementById('selectedCount');
+
+            selectAll.addEventListener('change', function() {
+                checkboxes.forEach(checkbox => {
+                    checkbox.checked = this.checked;
+                });
+                updateSelectedCount();
+            });
+
+            checkboxes.forEach(checkbox => {
+                checkbox.addEventListener('change', updateSelectedCount);
+            });
+
+            function updateSelectedCount() {
+                const checked = document.querySelectorAll('.article-checkbox:checked');
+                selectedCount.textContent = checked.length;
+            }
+        }
+
+        function setupFilters() {
+            // Filter functionality will be implemented here
+            document.getElementById('categoryFilter').addEventListener('change', applyFilters);
+            document.getElementById('statusFilter').addEventListener('change', applyFilters);
+            document.getElementById('dateFilter').addEventListener('change', applyFilters);
+        }
+
+        function setupSearch() {
+            const searchInput = document.getElementById('searchInput');
+            let searchTimeout;
+
+            searchInput.addEventListener('input', function() {
+                clearTimeout(searchTimeout);
+                searchTimeout = setTimeout(() => {
+                    performSearch();
+                }, 500);
+            });
+        }
+
+        function performSearch() {
+            const searchTerm = document.getElementById('searchInput').value;
+            const url = new URL(window.location);
+            
+            if (searchTerm) {
+                url.searchParams.set('search', searchTerm);
+            } else {
+                url.searchParams.delete('search');
+            }
+            
+            window.location.href = url.toString();
+        }
+
+        function applyFilters() {
+            const category = document.getElementById('categoryFilter').value;
+            const status = document.getElementById('statusFilter').value;
+            const date = document.getElementById('dateFilter').value;
+            
+            const url = new URL(window.location);
+            
+            if (category) url.searchParams.set('category', category);
+            else url.searchParams.delete('category');
+            
+            if (status) url.searchParams.set('status', status);
+            else url.searchParams.delete('status');
+            
+            if (date) url.searchParams.set('date', date);
+            else url.searchParams.delete('date');
+            
+            window.location.href = url.toString();
+        }
+
+        function resetFilters() {
+            document.getElementById('searchInput').value = '';
+            document.getElementById('categoryFilter').value = '';
+            document.getElementById('statusFilter').value = '';
+            document.getElementById('dateFilter').value = '';
+            
+            window.location.href = '/admin/articles';
+        }
+
+        function applyBulkAction() {
+            const action = document.getElementById('bulkAction').value;
+            const selected = Array.from(document.querySelectorAll('.article-checkbox:checked'))
+                .map(cb => cb.value);
+            
+            if (!action) {
+                showNotification('Please select an action', 'error');
+                return;
+            }
+            
+            if (selected.length === 0) {
+                showNotification('Please select at least one article', 'error');
+                return;
+            }
+            
+            if (!confirm(`Are you sure you want to ${action} ${selected.length} article(s)?`)) {
+                return;
+            }
+            
+            fetch('/admin/articles/bulk-action', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    action: action,
+                    articleIds: selected
+                })
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    showNotification(`Successfully ${action}d ${selected.length} article(s)`, 'success');
+                    setTimeout(() => window.location.reload(), 1000);
+                } else {
+                    showNotification(data.message || 'Failed to perform action', 'error');
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                showNotification('An error occurred', 'error');
+            });
+        }
+
+        function duplicateArticle(articleId) {
+            if (confirm('Are you sure you want to duplicate this article?')) {
+                fetch(`/admin/articles/${articleId}/duplicate`, {
+                    method: 'POST'
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        showNotification('Article duplicated successfully!', 'success');
+                        setTimeout(() => window.location.reload(), 1000);
+                    } else {
+                        showNotification('Failed to duplicate article', 'error');
+                    }
+                });
+            }
+        }
+
+        function deleteArticle(articleId) {
+            if (confirm('Are you sure you want to delete this article? This action cannot be undone.')) {
+                fetch(`/admin/articles/${articleId}`, {
+                    method: 'DELETE'
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        showNotification('Article deleted successfully!', 'success');
+                        setTimeout(() => window.location.reload(), 1000);
+                    } else {
+                        showNotification('Failed to delete article', 'error');
+                    }
+                });
+            }
+        }
+
+        function showNotification(message, type = 'info') {
+            const notification = document.createElement('div');
+            notification.className = `fixed top-4 right-4 z-50 p-4 rounded-lg shadow-lg transform translate-x-full transition-transform duration-300 ${
+                type === 'success' ? 'bg-green-600 text-white' :
+                type === 'error' ? 'bg-red-600 text-white' :
+                'bg-blue-600 text-white'
+            }`;
+            notification.textContent = message;
+            
+            document.body.appendChild(notification);
+            
+            setTimeout(() => {
+                notification.style.transform = 'translateX(0)';
+            }, 100);
+            
+            setTimeout(() => {
+                notification.style.transform = 'translateX(100%)';
+                setTimeout(() => {
+                    if (notification.parentNode) {
+                        document.body.removeChild(notification);
+                    }
+                }, 300);
+            }, 3000);
+        }
+    </script>
+</body>
+</html>
